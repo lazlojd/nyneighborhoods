@@ -17,24 +17,25 @@
 		return {lat: latCount/latSum, lng: lngCount/lngSum}
     }
 
+    var openedInfoWindow;
     //Info window with name when location is tapped
     var addListeners = function(polygon, name, avgCoords) {
     	google.maps.event.addListener(polygon, 'click', function (event) {
-    		var infoWindow = new google.maps.InfoWindow({
+        if (typeof(openedInfoWindow) !== "undefined")
+          openedInfoWindow.close()
+    		openedInfoWindow = new google.maps.InfoWindow({
     			content: name,
-    			position: avgCoords
+    			position: {lat: event.latLng.lat(), lng: event.latLng.lng()}
     		})
-    		infoWindow.open(map)
+    		openedInfoWindow.open(map)
     	})
     }
 	function drawNeighborhoods() {
 		var coordinates = boroughedNeighborhoods;
     var hoods = Object.keys(boroughs);
     for (var area in coordinates) {
-        // console.log(boroughs[area])
         var borough = coordinates[area]
         for(var neighborhood in borough) {
-           console.log(borough[neighborhood])
            var data = borough[neighborhood];
            // Find point to in neighborhood to assign info window to
            var avgC = avgCoords(data.coords);

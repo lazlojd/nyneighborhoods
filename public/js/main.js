@@ -17,14 +17,18 @@
 		return {lat: latCount/latSum, lng: lngCount/lngSum}
     }
 
+    var openedInfoWindow;
+
     //Info window with name when location is tapped
     var addListeners = function(polygon, name, avgCoords) {
     	google.maps.event.addListener(polygon, 'click', function (event) {
-    		var infoWindow = new google.maps.InfoWindow({
+        if (typeof(openedInfoWindow) !== "undefined")
+          openedInfoWindow.close()
+    		openedInfoWindow = new google.maps.InfoWindow({
     			content: name,
-    			position: avgCoords
+    			position: {lat: event.latLng.lat(), lng: event.latLng.lng()}
     		})
-    		infoWindow.open(map)
+    		openedInfoWindow.open(map)
     	})
     }
 	function drawNeighborhoods() {
@@ -34,7 +38,7 @@
         // console.log(boroughs[area])
         var borough = coordinates[area]
         for(var neighborhood in borough) {
-           console.log(borough[neighborhood])
+           //console.log(borough[neighborhood])
            var data = borough[neighborhood];
            // Find point to in neighborhood to assign info window to
            var avgC = avgCoords(data.coords);
@@ -50,31 +54,35 @@
             addListeners(border, neighborhood, avgC)
             border.setMap(map)
         }
-      }
-		
-      
+      }  
 	}
+  // function drawChicagoNeighborhoods() {
+  //   var kmlLayer = new google.maps.KmlLayer({
+  //     url: 'https://chicagomap.zolk.com/sources/neighborhoods/source.kml',
+  //     map: map
+  //   });
+  // }
 
-    function initMap(x, y) {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: x, lng: y},
-          zoom: 13
-        });
-        var marker = new google.maps.Marker({position: {lat: x, lng: y}, map: map});
-        //console.log(boroughedNeighborhoods.manhattan.)
-  		drawNeighborhoods()
-     }
-    function onPositionRecieved(position){
-    	var coords = position.coords;
-    	initMap(coords.latitude, coords.longitude);
-    }
+  function initMap(x, y) {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: x, lng: y},
+        zoom: 13
+      });
+      var marker = new google.maps.Marker({position: {lat: x, lng: y}, map: map});
+  	  drawNeighborhoods()
+      //drawChicagoNeighborhoods()
+   }
+  function onPositionRecieved(position){
+  	var coords = position.coords;
+  	initMap(coords.latitude, coords.longitude);
+  }
 
-    function locationNotRecieved(positionError){
-    	console.log(positionError);
-    }
-    if(navigator.geolocation) {
-    	navigator.geolocation.getCurrentPosition(onPositionRecieved, locationNotRecieved);
-    }
+  function locationNotRecieved(positionError){
+  	console.log(positionError);
+  }
+  if(navigator.geolocation) {
+  	navigator.geolocation.getCurrentPosition(onPositionRecieved, locationNotRecieved);
+  }
 
 
 } ());

@@ -1,6 +1,6 @@
 ---
 applications:
-- name: NYNeighborhoodView
+- name: NeighborhoodView
   memory: 512M
   instances: 1
   buildpack: nodejs_buildpack

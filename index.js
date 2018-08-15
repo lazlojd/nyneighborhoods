@@ -8,5 +8,5 @@ var app = express();
 });*/
 
 app.use(express.static(__dirname + '/public'));
-app.listen(8080);
-console.log('Now listening to port 8080');
+app.listen(3000);
+console.log('Now listening to port 3000');

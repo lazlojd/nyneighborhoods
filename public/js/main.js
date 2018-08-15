@@ -2,6 +2,14 @@
 	'use strict';
 
 	var map;
+  var openedInfoWindow;
+  var colors = [];
+  var marker
+  var options = {
+  enableHighAccuracy: false,
+  timeout: 5000,
+  maximumAge: 0
+  };
     
 
   function avgCoords(coords) {
@@ -17,8 +25,7 @@
 	  return {lat: latCount/latSum, lng: lngCount/lngSum}
   }
 
-  var openedInfoWindow;
-  var colors = [];
+  
   //Info window with name when location is tapped
   var addListeners = function(polygon, name) { 
   	google.maps.event.addListener(polygon, 'click', function (event) {
@@ -31,6 +38,8 @@
   		openedInfoWindow.open(map)
   	})
   }
+
+
 	function drawNYNeighborhoods() {
 		var coordinates = boroughedNeighborhoods;
     var hoods = Object.keys(boroughs);
@@ -53,6 +62,8 @@
         }
       }  
 	}
+
+
   function drawChicagoNeighborhoods() {
     var i = 0
     for (var neighborhood in chicagoNeighborhoods) {
@@ -75,23 +86,41 @@
     }
   }
 
+
   function initMap(x, y) {
       map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: x, lng: y},
         zoom: 13
       });
-      var marker = new google.maps.Marker({position: {lat: x, lng: y}, map: map});
+      marker = new google.maps.Marker({position: {lat: x, lng: y}, map: map});
+      beginPositionWatch()
   	  drawNYNeighborhoods()
       drawChicagoNeighborhoods()
-   }
+  }
+
+
   function onPositionRecieved(position){
   	var coords = position.coords;
   	initMap(coords.latitude, coords.longitude);
   }
 
+
   function locationNotRecieved(positionError){
   	console.log(positionError);
   }
+
+
+  function watchCoordinatesRecieved(pos) {
+    var coords = pos.coords
+    marker.setPosition({lat: coords.latitude, lng: coords.longitude})
+  }
+
+
+  function beginPositionWatch() {
+    navigator.geolocation.watchPosition(watchCoordinatesRecieved, locationNotRecieved, options)
+  }
+
+
   if(navigator.geolocation) {
   	navigator.geolocation.getCurrentPosition(onPositionRecieved, locationNotRecieved);
   }

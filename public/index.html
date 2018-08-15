@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Neighborhood Map</title>
+    <title>City Neighborhoods</title>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <style>
@@ -10,13 +10,20 @@
       #map {
         height: 100%;
       }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
     </style>
-    	<script type="text/javascript" src="/js/coordinates.js"></script>
-        <script type="text/javascript" src="/js/main.js"></script>
+    <script type="text/javascript" src="/js/chicagoCoordinates.js"></script>
+    <script type="text/javascript" src="/js/coordinates.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
   </head>
   <body>
     <div id="map"></div>
- 	<script type="text/javascript" src="main.js"></script>
+  <script type="text/javascript" src="main.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFUgxmwei_B8JH28wypn0I-l3ZfNQ1DSk&callback=initMap"
     async defer></script>
   </body>

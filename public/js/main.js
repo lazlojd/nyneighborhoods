@@ -4,44 +4,41 @@
 	var map;
     
 
-    function avgCoords(coords) {
-    	//console.log(coords);
-    	var latSum = 0, latCount = 0;
-    	var lngSum = 0, lngCount = 0;
-    	for (var data in coords) {
-    		latSum++;
-    		lngSum++;
-    		latCount += coords[data].lat;
-    		lngCount += coords[data].lng;
-    	}
-		return {lat: latCount/latSum, lng: lngCount/lngSum}
-    }
+  function avgCoords(coords) {
+  	//console.log(coords);
+  	var latSum = 0, latCount = 0;
+  	var lngSum = 0, lngCount = 0;
+  	for (var data in coords) {
+  		latSum++;
+  		lngSum++;
+  		latCount += coords[data].lat;
+  		lngCount += coords[data].lng;
+  	}
+	  return {lat: latCount/latSum, lng: lngCount/lngSum}
+  }
 
-    var openedInfoWindow;
-
-    //Info window with name when location is tapped
-    var addListeners = function(polygon, name, avgCoords) {
-    	google.maps.event.addListener(polygon, 'click', function (event) {
-        if (typeof(openedInfoWindow) !== "undefined")
-          openedInfoWindow.close()
-    		openedInfoWindow = new google.maps.InfoWindow({
-    			content: name,
-    			position: {lat: event.latLng.lat(), lng: event.latLng.lng()}
-    		})
-    		openedInfoWindow.open(map)
-    	})
-    }
-	function drawNeighborhoods() {
+  var openedInfoWindow;
+  var colors = [];
+  //Info window with name when location is tapped
+  var addListeners = function(polygon, name) { 
+  	google.maps.event.addListener(polygon, 'click', function (event) {
+      if (typeof(openedInfoWindow) !== "undefined")
+        openedInfoWindow.close()
+  		openedInfoWindow = new google.maps.InfoWindow({
+  			content: name,
+  			position: {lat: event.latLng.lat(), lng: event.latLng.lng()}
+  		})
+  		openedInfoWindow.open(map)
+  	})
+  }
+	function drawNYNeighborhoods() {
 		var coordinates = boroughedNeighborhoods;
     var hoods = Object.keys(boroughs);
     for (var area in coordinates) {
-        // console.log(boroughs[area])
         var borough = coordinates[area]
         for(var neighborhood in borough) {
-           //console.log(borough[neighborhood])
            var data = borough[neighborhood];
-           // Find point to in neighborhood to assign info window to
-           var avgC = avgCoords(data.coords);
+           colors.push(data.color)
            var border = new google.maps.Polygon({
               path: data.coords,
               geodesic: true,
@@ -51,17 +48,32 @@
               fillColor: '#' + data.color,
               fillOpacity: 0.25
             });
-            addListeners(border, neighborhood, avgC)
+            addListeners(border, neighborhood)
             border.setMap(map)
         }
       }  
 	}
-  // function drawChicagoNeighborhoods() {
-  //   var kmlLayer = new google.maps.KmlLayer({
-  //     url: 'https://chicagomap.zolk.com/sources/neighborhoods/source.kml',
-  //     map: map
-  //   });
-  // }
+  function drawChicagoNeighborhoods() {
+    var i = 0
+    for (var neighborhood in chicagoNeighborhoods) {
+      //console.log(chicagoNeighborhoods[neighborhood])
+      var data = chicagoNeighborhoods[neighborhood]
+      var border =  new google.maps.Polygon({
+              path: data.coords,
+              geodesic: true,
+              strokeColor: '#' + colors[i],
+              strokeOpacity: 1.0,
+              strokeWeight: 2,
+              fillColor: '#' + colors[i],
+              fillOpacity: 0.25
+      });
+      i += 1
+      if (i >= colors.length)
+        i = 0
+      addListeners(border, neighborhood)
+      border.setMap(map)
+    }
+  }
 
   function initMap(x, y) {
       map = new google.maps.Map(document.getElementById('map'), {
@@ -69,8 +81,8 @@
         zoom: 13
       });
       var marker = new google.maps.Marker({position: {lat: x, lng: y}, map: map});
-  	  drawNeighborhoods()
-      //drawChicagoNeighborhoods()
+  	  drawNYNeighborhoods()
+      drawChicagoNeighborhoods()
    }
   function onPositionRecieved(position){
   	var coords = position.coords;

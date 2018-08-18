@@ -1,10 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>City Neighborhoods</title>
     <link rel="icon" href="https://i0.wp.com/citychurchcanton.com/wp-content/uploads/2016/09/favicon.jpg">
-    <meta name="viewport" content="initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="/css/additionalStyle.css">
+
+    <!-- Angular.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>
+
+    <!-- Controller -->
+    <script src="/controllers/MapController.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <!-- Neighborhood Data -->
+    <script type="text/javascript" src="/js/chicagoCoordinates.js"></script>
+    <script type="text/javascript" src="/js/coordinates.js"></script>
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -18,14 +44,25 @@
         padding: 0;
       }
     </style>
-    <script type="text/javascript" src="/js/chicagoCoordinates.js"></script>
-    <script type="text/javascript" src="/js/coordinates.js"></script>
-    <script type="text/javascript" src="/js/main.js"></script>
+    
+
   </head>
-  <body>
-    <div id="map"></div>
-  <script type="text/javascript" src="main.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFUgxmwei_B8JH28wypn0I-l3ZfNQ1DSk&callback=initMap"
-    async defer></script>
+  <body ng-app="neighborhoods1.0">
+    <div ng-controller="MapController" class="app-container">
+      <div class="w3-sidebar w3-bar-block w3-card w3-animate-left" style="display:none" id="mySidebar">
+      <button class="w3-bar-item w3-button w3-large"
+      ng-click="w3_close()">Close &times;</button>
+      </div>
+
+
+
+
+
+      <div id="map">
+        
+      </div>
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFUgxmwei_B8JH28wypn0I-l3ZfNQ1DSk&callback=initMap"
+      async defer></script>
+    </div>
   </body>
 </html>

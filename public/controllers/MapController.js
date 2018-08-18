@@ -1,7 +1,20 @@
-var app = angular.module('neighborhoods1.0', []);
+var app = angular.module('neighborhoods1.0', [])
 
 
 app.controller('MapController', ['$scope', function($scope) {
+
+	var map;
+  	var openedInfoWindow;
+  	var colors = [];
+	var marker;
+	var option;
+	var chicago = {lat: 41.85, lng: -87.65};
+	var options = {
+	enableHighAccuracy: false,
+	timeout: 5000,
+	maximumAge: 0
+	};
+
 
 	function avgCoords(coords) {
 		//console.log(coords);
@@ -17,17 +30,18 @@ app.controller('MapController', ['$scope', function($scope) {
 	}
 
 
-	function w3_open() {
-
-	document.getElementById("mySidebar").style.width = "25%";
-	document.getElementById("mySidebar").style.display = "block";
+	$scope.openSidebar = function w3_open(option) {
+		console.log(option)
+		option = option	
+		document.getElementById("mySidebar").style.width = "25%";
+		document.getElementById("mySidebar").style.display = "block";
 
 	}
 
 
-	function w3_close() {
+	$scope.closeSidebar = function w3_close() {
 
-	document.getElementById("mySidebar").style.display = "none";
+		document.getElementById("mySidebar").style.display = "none";
 
 	}
 
@@ -42,7 +56,7 @@ app.controller('MapController', ['$scope', function($scope) {
 		controlUI.style.cursor = 'pointer';
 		controlUI.style.marginBottom = '22px';
 		controlUI.style.textAlign = 'center';
-		controlUI.title = 'Click to recenter the map';
+		controlUI.title = 'Click to open sidebar menu';
 		controlDiv.appendChild(controlUI);
 
 		// Set CSS for the control interior.
@@ -53,45 +67,52 @@ app.controller('MapController', ['$scope', function($scope) {
 		controlText.style.lineHeight = '38px';
 		controlText.style.paddingLeft = '5px';
 		controlText.style.paddingRight = '5px';
-		controlText.innerHTML = 'Center Map';
+		controlText.innerHTML = 'Highlights';
 		controlUI.appendChild(controlText);
 
 		// Setup the click event listeners: simply set the map to Chicago.
 		controlUI.addEventListener('click', function() {
-			w3_open();
+			$scope.openSidebar(2);
 		});
 
 	}
 
-	$scope.init = (function () {
-	'use strict';
-
-	var map;
-  	var openedInfoWindow;
-  	var colors = [];
-	var marker;
-	var chicago = {lat: 41.85, lng: -87.65};
-	var options = {
-	enableHighAccuracy: false,
-	timeout: 5000,
-	maximumAge: 0
-	};
-    
-
-
-	//Info window with name when location is tapped
 	var addListeners = function(polygon, name) { 
+		
 		google.maps.event.addListener(polygon, 'click', function (event) {
-	  if (typeof(openedInfoWindow) !== "undefined")
-	    openedInfoWindow.close()
+		  	console.log("event activated")
+		  	if (typeof(openedInfoWindow) !== "undefined")
+		    	openedInfoWindow.close()
+		    
 			openedInfoWindow = new google.maps.InfoWindow({
-				position: {lat: event.latLng.lat(), lng: event.latLng.lng()}
+				position: {lat: event.latLng.lat(), lng: event.latLng.lng()},
+				name: name
 			})
-	  openedInfoWindow.setContent('<p>' + name + '</p>' + '<button class="btn btn-secondary">Add Highlights</button>')
+
+			var infoWindowContent = document.createElement('div');
+			var infoWindowName = document.createElement('p');
+			infoWindowName.textContent = name;
+			var infoButton = document.createElement('button');
+			infoButton.class = 'btn btn-success';
+			infoButton.textContent = "Add Highlights"
+			infoButton.addEventListener('click', function() {
+				$scope.openSidebar(1);
+			})
+	 		infoWindowContent.appendChild(infoWindowName)
+			infoWindowContent.appendChild(infoButton)
+
+			openedInfoWindow.setContent(infoWindowContent)
 			openedInfoWindow.open(map)
 		})
 	}
 
+
+	$scope.init = (function () {
+	'use strict';
+
+
+	//Info window with name when location is tapped
+	
 
 	function drawNYNeighborhoods() {
 		var coordinates = boroughedNeighborhoods;
@@ -118,25 +139,25 @@ app.controller('MapController', ['$scope', function($scope) {
 
 
 	function drawChicagoNeighborhoods() {
-	var i = 0
-	for (var neighborhood in chicagoNeighborhoods) {
-	  //console.log(chicagoNeighborhoods[neighborhood])
-	  var data = chicagoNeighborhoods[neighborhood]
-	  var border =  new google.maps.Polygon({
-	          path: data.coords,
-	          geodesic: true,
-	          strokeColor: '#' + colors[i],
-	          strokeOpacity: 1.0,
-	          strokeWeight: 2,
-	          fillColor: '#' + colors[i],
-	          fillOpacity: 0.25
-	  });
-	  i += 1
-	  if (i >= colors.length)
-	    i = 0
-	  addListeners(border, neighborhood)
-	  border.setMap(map)
-	}
+		var i = 0
+		for (var neighborhood in chicagoNeighborhoods) {
+		  //console.log(chicagoNeighborhoods[neighborhood])
+		  var data = chicagoNeighborhoods[neighborhood]
+		  var border =  new google.maps.Polygon({
+		          path: data.coords,
+		          geodesic: true,
+		          strokeColor: '#' + colors[i],
+		          strokeOpacity: 1.0,
+		          strokeWeight: 2,
+		          fillColor: '#' + colors[i],
+		          fillOpacity: 0.25
+		  });
+		  i += 1
+		  if (i >= colors.length)
+		    i = 0
+		  addListeners(border, neighborhood)
+		  border.setMap(map)
+		}
 	}
 
 
@@ -165,7 +186,7 @@ app.controller('MapController', ['$scope', function($scope) {
 
 
 	function locationTrackNotRecieved(positionError){
-	console.log("position tracking error: " + positionError);
+		console.log("position tracking error: " + positionError);
 	}
 
 	function locationNotRecieved(positionError){
@@ -174,13 +195,13 @@ app.controller('MapController', ['$scope', function($scope) {
 
 
 	function watchCoordinatesRecieved(pos) {
-	var coords = pos.coords
-	marker.setPosition({lat: coords.latitude, lng: coords.longitude})
+		var coords = pos.coords
+		marker.setPosition({lat: coords.latitude, lng: coords.longitude})
 	}
 
 
 	function beginPositionWatch() {
-	navigator.geolocation.watchPosition(watchCoordinatesRecieved, locationTrackNotRecieved, options)
+		navigator.geolocation.watchPosition(watchCoordinatesRecieved, locationTrackNotRecieved, options)
 	}
 
 
@@ -189,6 +210,6 @@ app.controller('MapController', ['$scope', function($scope) {
 	}
 
 
-	})(); 
+	}) ( ); 
 	
 }])

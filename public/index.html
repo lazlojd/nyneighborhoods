@@ -9,12 +9,14 @@
     <!-- CSS -->
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="/css/additionalStyle.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
 
     <!-- Angular.js -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>
 
-    <!-- Controller -->
+    <!-- Controller/Directives -->
     <script src="/controllers/MapController.js"></script>
+    <!-- <script src="/directives/highlightDirectives.js"></script> -->
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -51,7 +53,13 @@
     <div ng-controller="MapController" class="app-container">
       <div class="w3-sidebar w3-bar-block w3-card w3-animate-left" style="display:none" id="mySidebar">
       <button class="w3-bar-item w3-button w3-large"
-      ng-click="w3_close()">Close &times;</button>
+      ng-click="closeSidebar()">Close &times;</button>
+
+      <!-- Two directive here: one for a listing of all highlights
+      and the second when user selects add highlifhts button on 
+      info window that pops up when user selects neighborhood -->
+      <singleNeighborhood ng-if="option == 1"></singleNeighborhood>
+      
       </div>
 
 

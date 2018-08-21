@@ -1,12 +1,23 @@
-var express = require('express');
-var app = express();
-//var path = require('path');
+const express = require('express');
+const app = express();
 
-// viewed at http://localhost:8080
-/*app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname + '/index.html'));
-});*/
+// const cors = require('cors');
 
-app.use(express.static(__dirname + '/public'));
-app.listen(8000);
-console.log('Now listening to port 8000');
+const bodyParser = require('body-parser')
+app.use(bodyParser.urlencoded({ extended: true}))
+app.use(bodyParser.json())
+
+app.use(express.static('public'))
+
+// app.use(cors());
+// app.options('*', cors())
+
+
+
+const port = process.env.port || 8081
+
+var server = app.listen(port, () => {
+	console.log('Now listening to port ' + port);
+})
+//app.use(express.static(__dirname + '/public'));
+app.listen(8081);

@@ -1,5 +1,5 @@
 angular.module('neighborhoods1.0', [])
-	.directive("allHighlights", function() {
+	.directive("singleNeighborhood", function() {
 		return {
 			templateUrl: 'singleNeighborhood.html'
 		}

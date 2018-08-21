@@ -50,16 +50,97 @@
 
   </head>
   <body ng-app="neighborhoods1.0">
-    <div ng-controller="MapController" class="app-container">
-      <div class="w3-sidebar w3-bar-block w3-card w3-animate-left" style="display:none" id="mySidebar">
-      <button class="w3-bar-item w3-button w3-large"
-      ng-click="closeSidebar()">Close &times;</button>
+    <script type="text/javascript" src="/js/fbLogin.js"></script>
 
+    <div id="fb-root"></div>
+    <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.1&appId=1931148150511468&autoLogAppEvents=1';
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+    <div ng-controller="MapController" class="app-container">
+      <!-- Modal -->
+      <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalWindow" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title" id="loginModalWindow">Login to continue</h3>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>In order to save your highlight, please login.</p>
+            </br>
+            </br>
+            
+                <div id="fbButton" class="fb-login-button btn-center" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false" scope="public_profile,email"
+              o onlogin="checkLoginState();"></div>
+             
+            
+              <script type="text/javascript"> function checkLoginState() {
+                FB.getLoginStatus(function(response) {
+                    console.log(response)
+                    document.getElementById("fbButton").style.display = "none";   
+                    document.getElementById("closeModal").style.display = "block";
+                    if (response.status == 'connected') {
+                      setTimeout(function() {
+                        document.getElementById("closeModalButton").click();
+                     
+                    }, 1500);
+
+                      
+                    }
+                    
+                  
+                });
+              }</script>
+              <div id ="closeModal" class="alert alert-success" style="display: none;">
+                You have successfully logged in. <strong>Close this window to continue.</strong>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button id="closeModalButton" type="button" class="btn btn-secondary" data-dismiss="modal" ng-click="processNewHighlight()">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="w3-sidebar w3-bar-block w3-card w3-animate-left sidebar-panel" style="display:none;" id="mySidebar">
+        <!-- <button class="btn-sidebar-left w3-bar-item w3-button w3-large "
+        ng-click="logOut()">Log in &times;</button> -->
+        <button class="btn-sidebar-left w3-bar-item w3-button w3-large "
+        ng-click="logOut()">Log out &times;</button>
+        <button class="btn-sidebar-right w3-bar-item w3-button w3-large"
+        ng-click="closeSidebar()">Close &times;</button>
+
+      
+      <div style="margin-top: 75px;" class="panel panel-default" ng-if="option == 2">
+          <div class="panel-heading">Your {{openName}} Highlights</div>
+          <div class="panel-body">
+            <p class="highlight" ng-repeat="text in highlights[openName] track by $index">{{text}}</p>
+          </div>
+      </div><!--/.panel-->
+
+      <form class="highlight-form" name="highlightForm">
+        <div class="form-group">
+          <label for="new">Your new highlight:</label>
+          <textarea rows="5" cols="25" class="highlight-textarea" id="new" type="text" ng-model="newHighlight" name="highlightInput" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#loginModal" ng-if="!loggedIn">Submit</button>
+        <button type="submit" class="btn btn-success" ng-click="processNewHighlight()" ng-if="loggedIn">Submit</button>
+      </form>
+
+      <!-- <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div> -->
       <!-- Two directive here: one for a listing of all highlights
       and the second when user selects add highlifhts button on 
       info window that pops up when user selects neighborhood -->
-      <singleNeighborhood ng-if="option == 1"></singleNeighborhood>
-      
+      <div>
+        
+      </div>
       </div>
 
 
@@ -71,6 +152,8 @@
       </div>
       <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFUgxmwei_B8JH28wypn0I-l3ZfNQ1DSk&callback=initMap"
       async defer></script>
+
+      
     </div>
   </body>
 </html>

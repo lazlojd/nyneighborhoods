@@ -1,19 +1,82 @@
 var app = angular.module('neighborhoods1.0', [])
 
 
+
+
 app.controller('MapController', ['$scope', function($scope) {
 
 	var map;
   	var openedInfoWindow;
   	var colors = [];
 	var marker;
-	var option;
+	var userInfo;
+	$scope.openName;
+	$scope.highlights = {}
+	$scope.loggedIn = false;
+	$scope.option = 2;
 	var chicago = {lat: 41.85, lng: -87.65};
 	var options = {
 	enableHighAccuracy: false,
 	timeout: 5000,
 	maximumAge: 0
 	};
+
+	$scope.logOut = function() {
+		FB.getLoginStatus(function(response) {
+			if (response && response.status === 'connected') {
+				FB.logout(function(response) {
+					alert("You have been logged out.")
+					$scope.loggedIn = false;
+					document.getElementById("fbButton").style.display = "block";   
+                    document.getElementById("closeModal").style.display = "none";
+					$scope.$apply();
+				})
+			}
+		})
+	}
+
+	/*
+	*
+	* Check log in status and update login state
+	*
+	*/
+	function checkLoginStatus() {
+		var result;
+		console.log("enered 2")
+		FB.getLoginStatus(function(response) {
+			console.log(response)
+			if (response.status === 'connected') {
+				$scope.loggedIn = true;
+				result = response.authResponse; 
+			} else {
+				$scope.loggedIn = false;
+
+			}
+			//$scope.$apply();
+		})
+		return result;
+	}
+	
+
+	$scope.processNewHighlight = function() {
+		console.log("entered")
+		var authResponse = checkLoginStatus()
+		if(typeof($scope.newHighlight) !== "undefined") {
+			// Verify log in status
+			
+			if (typeof(authResponse) !== "undefined") {
+				console.log("Adding: " + $scope.newHighlight)
+				if(typeof($scope.highlights[$scope.openName]) === "undefined") {
+					$scope.highlights[$scope.openName] = [$scope.newHighlight]
+				} else {
+					$scope.highlights[$scope.openName].push($scope.newHighlight)
+				}
+			}
+			
+		
+			console.log($scope.highlights)
+		}
+	}
 
 
 	function avgCoords(coords) {
@@ -31,8 +94,9 @@ app.controller('MapController', ['$scope', function($scope) {
 
 
 	$scope.openSidebar = function w3_open(option) {
-		console.log(option)
-		option = option	
+		$scope.option = option	
+		$scope.$apply();
+		console.log($scope.option)
 		document.getElementById("mySidebar").style.width = "25%";
 		document.getElementById("mySidebar").style.display = "block";
 
@@ -72,7 +136,7 @@ app.controller('MapController', ['$scope', function($scope) {
 
 		// Setup the click event listeners: simply set the map to Chicago.
 		controlUI.addEventListener('click', function() {
-			$scope.openSidebar(2);
+			$scope.openSidebar(1);
 		});
 
 	}
@@ -83,12 +147,12 @@ app.controller('MapController', ['$scope', function($scope) {
 		  	console.log("event activated")
 		  	if (typeof(openedInfoWindow) !== "undefined")
 		    	openedInfoWindow.close()
-		    
+
 			openedInfoWindow = new google.maps.InfoWindow({
 				position: {lat: event.latLng.lat(), lng: event.latLng.lng()},
-				name: name
 			})
-
+			$scope.openName = name
+			$scope.$apply()
 			var infoWindowContent = document.createElement('div');
 			var infoWindowName = document.createElement('p');
 			infoWindowName.textContent = name;
@@ -96,7 +160,7 @@ app.controller('MapController', ['$scope', function($scope) {
 			infoButton.class = 'btn btn-success';
 			infoButton.textContent = "Add Highlights"
 			infoButton.addEventListener('click', function() {
-				$scope.openSidebar(1);
+				$scope.openSidebar(2);
 			})
 	 		infoWindowContent.appendChild(infoWindowName)
 			infoWindowContent.appendChild(infoButton)
@@ -111,7 +175,7 @@ app.controller('MapController', ['$scope', function($scope) {
 	'use strict';
 
 
-	//Info window with name when location is tapped
+	//Info window when neighborhood is clicked
 	
 
 	function drawNYNeighborhoods() {

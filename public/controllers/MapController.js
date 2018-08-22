@@ -3,7 +3,7 @@ var app = angular.module('neighborhoods1.0', [])
 
 
 
-app.controller('MapController', ['$scope', function($scope) {
+app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 
 	var map;
   	var openedInfoWindow;
@@ -11,9 +11,11 @@ app.controller('MapController', ['$scope', function($scope) {
 	var marker;
 	var userInfo;
 	var authResponse;
-	const url = 'http://localhost:9000/'	
+	const url = 'http://localhost:9000/api'	
 	$scope.openName;
 	$scope.highlights;
+	$scope.allHighlights;
+	$scope.formData = {};
 	$scope.loggedIn = false;
 	$scope.option = 2;
 	var chicago = {lat: 41.85, lng: -87.65};
@@ -29,6 +31,8 @@ app.controller('MapController', ['$scope', function($scope) {
 				FB.logout(function(response) {
 					alert("You have been logged out.")
 					$scope.loggedIn = false;
+					$scope.highlights = [];
+					authResponse = undefined
 					document.getElementById("fbButton").style.display = "block";   
                     document.getElementById("closeModal").style.display = "none";
 					$scope.$apply();
@@ -49,7 +53,7 @@ app.controller('MapController', ['$scope', function($scope) {
 			console.log(response)
 			if (response.status === 'connected') {
 				$scope.loggedIn = true;
-				result = response.authResponse; 
+				result = response; 
 			} else {
 				$scope.loggedIn = false;
 
@@ -63,16 +67,21 @@ app.controller('MapController', ['$scope', function($scope) {
 	$scope.processNewHighlight = function() {
 		console.log("entered")
 		authResponse = checkLoginStatus()
-		if(typeof($scope.newHighlight) !== "undefined") {
+		if(typeof($scope.formData.newHighlight) !== "undefined") {
 			// Verify log in status
 			if (typeof(authResponse) !== "undefined") {
-				console.log("Adding: " + $scope.newHighlight)
-				if(typeof($scope.highlights) === "undefined") {
-					$scope.highlights = [$scope.newHighlight]
+				// console.log("Adding: " + $scope.formData.newHighlight)
+				if(typeof($scope.highlights) === "undefined" || $scope.highlights == "") {
+					$scope.highlights = [$scope.formData.newHighlight]
 				} else {
-					$scope.highlights.push($scope.newHighlight)
+					$scope.highlights.push($scope.formData.newHighlight)
 				}
+				$http.post(url + '/' + authResponse.authResponse.userID + '/newHighlight',
+					{ "neighborhood": $scope.openName, "text": $scope.formData.newHighlight}).then(function(response){
+						console.log(response)
+					})
 			}
+
 			
 		
 			console.log($scope.highlights)
@@ -95,9 +104,21 @@ app.controller('MapController', ['$scope', function($scope) {
 
 
 	$scope.openSidebar = function w3_open(option) {
-		$scope.option = option	
+		$scope.option = option
+		if ($scope.option == 1) {
+			if (typeof(authResponse) !== "undefined") {
+				$http.get(url + '/'+ authResponse.authResponse.userID + '/allHighlights').then(function(response) {
+					// console.log(response)
+					$scope.allHighlights = response.data.highlights;
+					console.log($scope.allHighlights)
+				})
+
+			}
+			
+		}
+
 		$scope.$apply();
-		console.log($scope.option)
+		// console.log($scope.option)
 		document.getElementById("mySidebar").style.width = "25%";
 		document.getElementById("mySidebar").style.display = "block";
 
@@ -110,7 +131,7 @@ app.controller('MapController', ['$scope', function($scope) {
 
 	}
 
-	function CenterControl(controlDiv, map) {
+	function HighlightControl(controlDiv, map, option) {
 
 		// Set CSS for the control border.
 		var controlUI = document.createElement('div');
@@ -121,8 +142,7 @@ app.controller('MapController', ['$scope', function($scope) {
 		controlUI.style.cursor = 'pointer';
 		controlUI.style.marginBottom = '22px';
 		controlUI.style.textAlign = 'center';
-		controlUI.title = 'Click to open sidebar menu';
-		controlDiv.appendChild(controlUI);
+		
 
 		// Set CSS for the control interior.
 		var controlText = document.createElement('div');
@@ -132,21 +152,56 @@ app.controller('MapController', ['$scope', function($scope) {
 		controlText.style.lineHeight = '38px';
 		controlText.style.paddingLeft = '5px';
 		controlText.style.paddingRight = '5px';
-		controlText.innerHTML = 'Highlights';
+		
+
+		if(option) {
+			controlUI.title = 'Click to log in';
+			controlText.innerHTML = 'Log in';
+
+		} else {
+			controlUI.title = 'Click to open sidebar menu';
+			controlText.innerHTML = 'Highlights';
+
+		}
+		controlDiv.appendChild(controlUI);
 		controlUI.appendChild(controlText);
 
 		// Setup the click event listeners: simply set the map to Chicago.
 		controlUI.addEventListener('click', function() {
-			$scope.openSidebar(1);
+			if(option) {
+				FB.login(function(response) {
+					authResponse = response;
+					if (authResponse.status === 'connected') {
+						$scope.loggedIn = true;
+					}
+					console.log(authResponse)
+				})	
+			} else 
+				$scope.openSidebar(1);
 		});
 
+	}
+
+	function createInfoWindowContents(name) {
+		var infoWindowContent = document.createElement('div');
+		var infoWindowName = document.createElement('p');
+		infoWindowName.textContent = name;
+		var infoButton = document.createElement('button');
+		infoButton.class = 'btn btn-success';
+		infoButton.textContent = "View highlights"
+		infoButton.addEventListener('click', function() {
+			$scope.openSidebar(2);
+		})
+ 		infoWindowContent.appendChild(infoWindowName)
+		infoWindowContent.appendChild(infoButton)
+		return infoWindowContent;
 	}
 
 
 	var addListeners = function(polygon, name) { 
 		
 		google.maps.event.addListener(polygon, 'click', function (event) {
-		  	console.log("event activated")
+		  	// console.log("event activated")
 		  	if (typeof(openedInfoWindow) !== "undefined")
 		    	openedInfoWindow.close()
 
@@ -154,27 +209,17 @@ app.controller('MapController', ['$scope', function($scope) {
 				position: {lat: event.latLng.lat(), lng: event.latLng.lng()},
 			})
 			$scope.openName = name
+			// console.log(authResponse)
 			if (typeof(authResponse) !== "undefined") {
-				$http.get(link + '/'+ authResponse.userID + '/' + $scope.openName + '/allHighlights').then(function(response) {
-
+				$http.get(url + '/'+ authResponse.authResponse.userID + '/' + $scope.openName + '/allHighlights').then(function(response) {
+					console.log(response)
+					$scope.highlights = response.data;
 				})
 
 			}
 			
 			$scope.$apply()
-			var infoWindowContent = document.createElement('div');
-			var infoWindowName = document.createElement('p');
-			infoWindowName.textContent = name;
-			var infoButton = document.createElement('button');
-			infoButton.class = 'btn btn-success';
-			infoButton.textContent = "Add Highlights"
-			infoButton.addEventListener('click', function() {
-				$scope.openSidebar(2);
-			})
-	 		infoWindowContent.appendChild(infoWindowName)
-			infoWindowContent.appendChild(infoButton)
-
-			openedInfoWindow.setContent(infoWindowContent)
+			openedInfoWindow.setContent(createInfoWindowContents(name))
 			openedInfoWindow.open(map)
 		})
 	}
@@ -244,11 +289,17 @@ app.controller('MapController', ['$scope', function($scope) {
 	  beginPositionWatch()
 	  drawNYNeighborhoods()
 	  drawChicagoNeighborhoods()
-	  var centerControlDiv = document.createElement('div');
-	  var centerControl = new CenterControl(centerControlDiv, map);
+	  var highlightControlDiv = document.createElement('div');
+	  var highlightControl = new HighlightControl(highlightControlDiv, map, false);
 
-	  centerControlDiv.index = 1;
-	  map.controls[google.maps.ControlPosition.RIGHT_TOP].push(centerControlDiv);
+	  var loginControlDiv = document.createElement('div');
+	  var loginControl = new HighlightControl(loginControlDiv, map, true);
+
+	  highlightControlDiv.index = 1;
+	  loginControlDiv.index = 0;
+	  map.controls[google.maps.ControlPosition.RIGHT_TOP].push(highlightControlDiv);
+	  map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(loginControlDiv);
+
 	}
 
 
@@ -259,7 +310,7 @@ app.controller('MapController', ['$scope', function($scope) {
 
 
 	function locationTrackNotRecieved(positionError){
-		console.log("position tracking error: " + positionError);
+		console.log(positionError);
 	}
 
 	function locationNotRecieved(positionError){

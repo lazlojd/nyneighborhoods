@@ -113,27 +113,42 @@
         <!-- <button class="btn-sidebar-left w3-bar-item w3-button w3-large "
         ng-click="logOut()">Log in &times;</button> -->
         <button class="btn-sidebar-left w3-bar-item w3-button w3-large "
-        ng-click="logOut()">Log out &times;</button>
+        ng-click="logOut()">Log out </button>
         <button class="btn-sidebar-right w3-bar-item w3-button w3-large"
         ng-click="closeSidebar()">Close &times;</button>
 
-      
-      <div style="margin-top: 75px;" class="panel panel-default" ng-if="option == 2">
-          <div class="panel-heading">Your {{openName}} Highlights</div>
-          <div class="panel-body">
-            <p class="highlight" ng-repeat="text in highlights track by $index">{{text}}</p>
+      <div style="margin-top: 75px;" ng-if="option == 1">
+        <div class="panel panel-default" ng-repeat="(key, value) in allHighlights">
+            <div class="panel-heading">{{key}}</div>
+            <div class="panel-body">
+              <p class="highlight" ng-repeat="text in value track by $index">{{text}}</p>
+            </div>
+        </div><!--/.panel-->
+
+
+      </div>
+
+
+
+
+      <div ng-if="option == 2">
+        <div style="margin-top: 75px;" class="panel panel-default" >
+            <div class="panel-heading">Your {{openName}} Highlights</div>
+            <div class="panel-body">
+              <p class="highlight" ng-repeat="text in highlights track by $index">{{text}}</p>
+            </div>
+        </div><!--/.panel-->
+
+        <form class="highlight-form" name="highlightForm">
+          <div>
+            <label for="new">Your new highlight:</label>
+            <textarea rows="5" class="highlight-textarea" id="new" type="text" ng-model="formData.newHighlight" name="highlightInput" required></textarea>
           </div>
-      </div><!--/.panel-->
 
-      <form class="highlight-form" name="highlightForm">
-        <div class="form-group">
-          <label for="new">Your new highlight:</label>
-          <textarea rows="5" cols="25" class="highlight-textarea" id="new" type="text" ng-model="newHighlight" name="highlightInput" required></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#loginModal" ng-if="!loggedIn">Submit</button>
-        <button type="submit" class="btn btn-success" ng-click="processNewHighlight()" ng-if="loggedIn">Submit</button>
-      </form>
+          <button type="submit" class="btn btn-light" data-toggle="modal" data-target="#loginModal" ng-if="!loggedIn">Submit</button>
+          <button type="submit" class="btn btn-success" ng-click="processNewHighlight()" ng-if="loggedIn">Submit</button>
+        </form>
+    </div>
 
       <!-- <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div> -->
       <!-- Two directive here: one for a listing of all highlights

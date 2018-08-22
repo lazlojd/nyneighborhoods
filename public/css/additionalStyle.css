@@ -5,6 +5,7 @@
 
 .highlight-textarea {
 	resize: none;
+	width: 80%;
 }
 
 .highlight-form {
@@ -16,6 +17,7 @@
 	border-bottom-width: 2px; 
 	border-bottom-style: solid;
 	border-color: #F1F1F1;
+	word-wrap: break-word;
 }
 
 .btn-center {

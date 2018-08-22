@@ -3,22 +3,7 @@ const router = express.Router();
 
 const mongodb = require('mongodb')
 
-let seedData = [
-   {
-		userID: "123456789", 
-		highlights: {
-			bridgeport: ["blah blah blal", "hey hey hey", "yo, yo, yo"],
-			"navy pier": ["blah blah blal", "hey hey hey", "yo, yo, yo"]
-		}
-	},
-	{
-		userID: "987654321", 
-		highlights: {
-			bridgeport: ["blah blah blal", "hey hey hey", "yo, yo, yo"],
-			"navy pier": ["blah blah blal", "hey hey hey", "yo, yo, yo"]
-		}
-	}
-]
+
 let users;
 
 let uri = 'mongodb://dbuser1:123DBuser456@ds125602.mlab.com:25602/neighborhoodhighlights';
@@ -29,10 +14,6 @@ mongodb.MongoClient.connect(uri, { useNewUrlParser: true }, function(err, client
 	users = db.collection('users');
 	users.deleteMany({})
 
-	users.insertMany(seedData, function(err, result) {
-		if (err) throw err;
-
-	})
 })
 
 
@@ -49,7 +30,10 @@ router.get('/:user/:neighborhood/allHighlights', function(req, res) {
 	let user = req.params["user"]
 	let neighborhood = req.params["neighborhood"]
 	users.findOne({userID: {$eq: user}}, function(err, result) {
-		res.send(result.highlights[neighborhood])
+		if (result != null)
+			res.send(result.highlights[neighborhood])
+		else
+			res.send([])
 	})
 })
 
@@ -123,7 +107,7 @@ router.post('/:user/newHighlight', function(req, res) {
 			}
 			newUser.highlights[req.body.neighborhood] = [req.body.text]
 			users.insertOne(newUser)
-			res.send("new User added" + newUser)
+			res.send("new User added")
 		}
 		
 	})

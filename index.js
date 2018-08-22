@@ -14,10 +14,11 @@ app.use(express.static('public'))
 
 
 
-const port = process.env.port || 8081
+const port = process.env.port || 9000
 
 var server = app.listen(port, () => {
 	console.log('Now listening to port ' + port);
 })
 //app.use(express.static(__dirname + '/public'));
-app.listen(8081);
+const routes = require('./routes');
+app.use('/api', routes)

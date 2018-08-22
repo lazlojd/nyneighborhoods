@@ -97,7 +97,8 @@
                     
                   
                 });
-              }</script>
+              }
+            </script>
               <div id ="closeModal" class="alert alert-success" style="display: none;">
                 You have successfully logged in. <strong>Close this window to continue.</strong>
               </div>
@@ -120,7 +121,7 @@
       <div style="margin-top: 75px;" class="panel panel-default" ng-if="option == 2">
           <div class="panel-heading">Your {{openName}} Highlights</div>
           <div class="panel-body">
-            <p class="highlight" ng-repeat="text in highlights[openName] track by $index">{{text}}</p>
+            <p class="highlight" ng-repeat="text in highlights track by $index">{{text}}</p>
           </div>
       </div><!--/.panel-->
 

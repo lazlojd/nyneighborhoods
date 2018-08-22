@@ -10,8 +10,10 @@ app.controller('MapController', ['$scope', function($scope) {
   	var colors = [];
 	var marker;
 	var userInfo;
+	var authResponse;
+	const url = 'http://localhost:9000/'	
 	$scope.openName;
-	$scope.highlights = {}
+	$scope.highlights;
 	$scope.loggedIn = false;
 	$scope.option = 2;
 	var chicago = {lat: 41.85, lng: -87.65};
@@ -60,16 +62,15 @@ app.controller('MapController', ['$scope', function($scope) {
 
 	$scope.processNewHighlight = function() {
 		console.log("entered")
-		var authResponse = checkLoginStatus()
+		authResponse = checkLoginStatus()
 		if(typeof($scope.newHighlight) !== "undefined") {
 			// Verify log in status
-			
 			if (typeof(authResponse) !== "undefined") {
 				console.log("Adding: " + $scope.newHighlight)
-				if(typeof($scope.highlights[$scope.openName]) === "undefined") {
-					$scope.highlights[$scope.openName] = [$scope.newHighlight]
+				if(typeof($scope.highlights) === "undefined") {
+					$scope.highlights = [$scope.newHighlight]
 				} else {
-					$scope.highlights[$scope.openName].push($scope.newHighlight)
+					$scope.highlights.push($scope.newHighlight)
 				}
 			}
 			
@@ -141,6 +142,7 @@ app.controller('MapController', ['$scope', function($scope) {
 
 	}
 
+
 	var addListeners = function(polygon, name) { 
 		
 		google.maps.event.addListener(polygon, 'click', function (event) {
@@ -152,6 +154,13 @@ app.controller('MapController', ['$scope', function($scope) {
 				position: {lat: event.latLng.lat(), lng: event.latLng.lng()},
 			})
 			$scope.openName = name
+			if (typeof(authResponse) !== "undefined") {
+				$http.get(link + '/'+ authResponse.userID + '/' + $scope.openName + '/allHighlights').then(function(response) {
+
+				})
+
+			}
+			
 			$scope.$apply()
 			var infoWindowContent = document.createElement('div');
 			var infoWindowName = document.createElement('p');
@@ -233,7 +242,7 @@ app.controller('MapController', ['$scope', function($scope) {
 
 	  marker = new google.maps.Marker({position: {lat: 41.826116, lng: -87.642111}, map: map});
 	  beginPositionWatch()
-		  drawNYNeighborhoods()
+	  drawNYNeighborhoods()
 	  drawChicagoNeighborhoods()
 	  var centerControlDiv = document.createElement('div');
 	  var centerControl = new CenterControl(centerControlDiv, map);

@@ -12,7 +12,7 @@ mongodb.MongoClient.connect(uri, { useNewUrlParser: true }, function(err, client
 
 	let db = client.db('neighborhoodhighlights')
 	users = db.collection('users');
-	users.deleteMany({})
+	//users.deleteMany({})
 
 })
 
@@ -47,13 +47,13 @@ router.get('/:user/allHighlights', function(req, res) {
 })
 
 // Delete particular highlight in particular neighborhood
-// body will inculde neighborhood to delete (ex: {delete: "bridgeport"}) 
+// body will inculde neighborhood to delete (ex: {neighborhood: "bridgeport"}) 
 router.post('/:user/:index/delete', function(req, res) {
 	let user = req.params["user"]
 	let index = req.params["index"]
 	users.findOne({userID: {$eq: user}}, function(err, result) {
-		result.highlights[req.body.delete].splice(index, 1)
-		console.log(result.highlights[req.body.delete])
+		result.highlights[req.body.neighborhood].splice(index, 1)
+		console.log(result.highlights[req.body.neighborhood])
 		let highlights = result.highlights;
 		users.updateOne(
 				{userID: {$eq: user}}, 
@@ -77,7 +77,7 @@ router.post('/:user/:index/edit', function(req, res) {
 				{userID: {$eq: user}}, 
 				{$set: {highlights: highlights} }
 				);
-		res.send("highlight edited")
+		res.send(highlights[req.body.neighborhood])
 	})
 	
 })

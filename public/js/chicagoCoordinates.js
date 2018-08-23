@@ -66363,7 +66363,7 @@ Dunning: {
 		lat: 41.7242386179254,
 		lng:  -87.5802782441305
 	}]},
-"Ida B. Wells / Darrow Homes": {
+"Ida B. Wells -- Darrow Homes": {
 	coords:[{
 		lat: 41.8311862254223,
 		lng: -87.6106333581487
@@ -129084,7 +129084,7 @@ Streeterville: {
 		lat: 41.9826170196832,
 		lng:  -87.7877406592159
 	}]},
-"University Village / Little Italy": {
+"University Village -- Little Italy": {
 	coords:[{
 		lat: 41.8758677547628,
 		lng: -87.65748540159279

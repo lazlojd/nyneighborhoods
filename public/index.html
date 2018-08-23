@@ -121,7 +121,7 @@
         <div class="panel panel-default" ng-repeat="(key, value) in allHighlights">
             <div class="panel-heading">{{key}}</div>
             <div class="panel-body">
-              <p class="highlight" ng-repeat="text in value track by $index">{{text}}</p>
+              <p class="highlight-1" ng-repeat="text in value track by $index">{{text}}</p>
             </div>
         </div><!--/.panel-->
 
@@ -134,8 +134,20 @@
       <div ng-if="option == 2">
         <div style="margin-top: 75px;" class="panel panel-default" >
             <div class="panel-heading">Your {{openName}} Highlights</div>
-            <div class="panel-body">
-              <p class="highlight" ng-repeat="text in highlights track by $index">{{text}}</p>
+            <div class="panel-body flex-container">
+              <div class="highlight-border" ng-repeat="text in highlights track by $index">
+
+                <p id="{{'p' + $index}}" class="highlight" ng-click="showHighlightOptions($index)" >{{text}}</p>
+                <textarea rows="1" class="highlight-textarea-edit" id="{{'edit-text' + $index}}" type="text" name="highlight-edit">{{text}}</textarea>
+                <!-- Save edits button -->
+                <button id="{{'edit-save' + $index}}" class="btn-success btn-change-highlights-save" ng-click="saveHighlightEdit($index)"><img src="/images/circle-check.svg"></button>
+
+                <!-- Standard buttons -->
+                <button id="{{'edit' + $index}}" class="btn-warning btn-change-highlights" ng-click="editHighlight($index)"><img src="/images/pencil.svg"></button>
+                <button id="{{'delete' + $index}}" class="btn-danger btn-change-highlights" ng-click="deleteHighlight($index)"><img src="/images/delete.svg"></button>
+                <button id="{{'close' + $index}}" class="btn-info btn-change-highlights" ng-click="closeHighlightOptions($index)"><img src="/images/x.svg"></button>
+            
+            </div>
             </div>
         </div><!--/.panel-->
 
@@ -150,10 +162,6 @@
         </form>
     </div>
 
-      <!-- <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div> -->
-      <!-- Two directive here: one for a listing of all highlights
-      and the second when user selects add highlifhts button on 
-      info window that pops up when user selects neighborhood -->
       <div>
         
       </div>

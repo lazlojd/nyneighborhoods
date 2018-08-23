@@ -11,6 +11,7 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 	var marker;
 	var userInfo;
 	var authResponse;
+	$scope.clicked = false;
 	const url = 'http://localhost:9000/api'	
 	$scope.openName;
 	$scope.highlights;
@@ -25,6 +26,66 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 	maximumAge: 0
 	};
 
+
+	$scope.saveHighlightEdit = function(index) {
+		var edit = document.getElementById("edit-text" + index).value
+		$http.post(url + '/' + authResponse.authResponse.userID + '/' + index + '/edit',
+			{"neighborhood": $scope.openName, "text": edit}).then(function(response) {
+				$scope.highlights = response.data
+				$scope.closeHighlightOptions(index)
+
+			}
+		)
+
+	}
+
+
+	$scope.editHighlight = function(index) {
+		document.getElementById("p" + index).style.display = "none"
+		document.getElementById("edit-text" + index).style.display = "block"
+		document.getElementById("edit-save" + index).style.display = "block"
+		document.getElementById("edit" + index).style.display = "none"
+		document.getElementById("delete" + index).style.display = "none"
+	}
+
+
+	$scope.deleteHighlight = function(index) {
+		if(confirm("Are you sure you want to delete this highlight?")) {
+			$scope.highlights.splice(index, 1);
+			$http.post(url + '/' + authResponse.authResponse.userID + '/' + index + '/delete',
+				{"neighborhood": $scope.openName}).then(function(response) {
+					//console.log(response)
+				})
+		}
+	}
+
+
+	$scope.closeHighlightOptions = function(index) {
+		//console.log(index + ' as index')
+		document.getElementById("p" + index).style.display = "block"
+		document.getElementById("p" + index).style.width = "100%"
+		document.getElementById("edit-text" + index).style.display = "none"
+		document.getElementById("edit" + index).style.display = "none"
+		document.getElementById("edit-save" + index).style.display = "none"
+		document.getElementById("delete" + index).style.display = "none"
+		document.getElementById("close" + index).style.display = "none"	
+	}
+
+
+	$scope.showHighlightOptions = function(index) {
+	
+		//console.log("click triggered")
+		document.getElementById("p" + index).style.width = "70%"
+		document.getElementById("edit" + index).style.display = "block"
+		document.getElementById("edit" + index).style.width = "10%"
+		document.getElementById("delete" + index).style.display = "block"
+		document.getElementById("delete" + index).style.width = "10%"
+		document.getElementById("close" + index).style.display = "block"
+		document.getElementById("close" + index).style.width = "10%"
+
+
+	}
+
 	$scope.logOut = function() {
 		FB.getLoginStatus(function(response) {
 			if (response && response.status === 'connected') {
@@ -32,6 +93,7 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 					alert("You have been logged out.")
 					$scope.loggedIn = false;
 					$scope.highlights = [];
+					$scope.allHighlights = {};
 					authResponse = undefined
 					document.getElementById("fbButton").style.display = "block";   
                     document.getElementById("closeModal").style.display = "none";
@@ -48,9 +110,9 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 	*/
 	function checkLoginStatus() {
 		var result;
-		console.log("enered 2")
+		//console.log("enered 2")
 		FB.getLoginStatus(function(response) {
-			console.log(response)
+			//console.log(response)
 			if (response.status === 'connected') {
 				$scope.loggedIn = true;
 				result = response; 
@@ -63,14 +125,20 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 		return result;
 	}
 	
+	function getHighlightsforNeighborhood(neighborhood) {
+		$http.get(url + '/' + authResponse.authResponse.userID + '/' + neighborhood +  '/allHighlights').then(function(response) {
+			$scope.highlights = response.data
+		})
+	}
+
 
 	$scope.processNewHighlight = function() {
-		console.log("entered")
+		//console.log("entered")
 		authResponse = checkLoginStatus()
 		if(typeof($scope.formData.newHighlight) !== "undefined") {
 			// Verify log in status
 			if (typeof(authResponse) !== "undefined") {
-				// console.log("Adding: " + $scope.formData.newHighlight)
+				// //console.log("Adding: " + $scope.formData.newHighlight)
 				if(typeof($scope.highlights) === "undefined" || $scope.highlights == "") {
 					$scope.highlights = [$scope.formData.newHighlight]
 				} else {
@@ -78,19 +146,20 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 				}
 				$http.post(url + '/' + authResponse.authResponse.userID + '/newHighlight',
 					{ "neighborhood": $scope.openName, "text": $scope.formData.newHighlight}).then(function(response){
-						console.log(response)
+						//console.log(response)
+						getHighlightsforNeighborhood($scope.openName)
 					})
 			}
 
 			
 		
-			console.log($scope.highlights)
+			//console.log($scope.highlights)
 		}
 	}
 
 
 	function avgCoords(coords) {
-		//console.log(coords);
+		////console.log(coords);
 		var latSum = 0, latCount = 0;
 		var lngSum = 0, lngCount = 0;
 		for (var data in coords) {
@@ -105,12 +174,13 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 
 	$scope.openSidebar = function w3_open(option) {
 		$scope.option = option
+		console.log($scope.option)
 		if ($scope.option == 1) {
 			if (typeof(authResponse) !== "undefined") {
 				$http.get(url + '/'+ authResponse.authResponse.userID + '/allHighlights').then(function(response) {
-					// console.log(response)
+					// //console.log(response)
 					$scope.allHighlights = response.data.highlights;
-					console.log($scope.allHighlights)
+					//console.log($scope.allHighlights)
 				})
 
 			}
@@ -118,7 +188,7 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 		}
 
 		$scope.$apply();
-		// console.log($scope.option)
+		// //console.log($scope.option)
 		document.getElementById("mySidebar").style.width = "25%";
 		document.getElementById("mySidebar").style.display = "block";
 
@@ -174,7 +244,7 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 					if (authResponse.status === 'connected') {
 						$scope.loggedIn = true;
 					}
-					console.log(authResponse)
+					//console.log(authResponse)
 				})	
 			} else 
 				$scope.openSidebar(1);
@@ -183,6 +253,9 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 	}
 
 	function createInfoWindowContents(name) {
+		$scope.openName = name
+		$scope.option = 2
+		$scope.highlights = [];
 		var infoWindowContent = document.createElement('div');
 		var infoWindowName = document.createElement('p');
 		infoWindowName.textContent = name;
@@ -190,7 +263,25 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 		infoButton.class = 'btn btn-success';
 		infoButton.textContent = "View highlights"
 		infoButton.addEventListener('click', function() {
-			$scope.openSidebar(2);
+			if (typeof(authResponse) !== "undefined") {
+				$http.get(url + '/'+ authResponse.authResponse.userID + '/' + $scope.openName + '/allHighlights').then(function(response) {
+					console.log(response)
+
+					$scope.highlights = response.data;
+					
+					
+					//$scope.$apply()		
+					
+				})
+
+			} else {
+				
+				$scope.$apply()	
+			} 
+
+				
+			document.getElementById("mySidebar").style.width = "25%";
+			document.getElementById("mySidebar").style.display = "block";	
 		})
  		infoWindowContent.appendChild(infoWindowName)
 		infoWindowContent.appendChild(infoButton)
@@ -201,24 +292,12 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 	var addListeners = function(polygon, name) { 
 		
 		google.maps.event.addListener(polygon, 'click', function (event) {
-		  	// console.log("event activated")
 		  	if (typeof(openedInfoWindow) !== "undefined")
 		    	openedInfoWindow.close()
 
 			openedInfoWindow = new google.maps.InfoWindow({
 				position: {lat: event.latLng.lat(), lng: event.latLng.lng()},
 			})
-			$scope.openName = name
-			// console.log(authResponse)
-			if (typeof(authResponse) !== "undefined") {
-				$http.get(url + '/'+ authResponse.authResponse.userID + '/' + $scope.openName + '/allHighlights').then(function(response) {
-					console.log(response)
-					$scope.highlights = response.data;
-				})
-
-			}
-			
-			$scope.$apply()
 			openedInfoWindow.setContent(createInfoWindowContents(name))
 			openedInfoWindow.open(map)
 		})
@@ -259,7 +338,7 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 	function drawChicagoNeighborhoods() {
 		var i = 0
 		for (var neighborhood in chicagoNeighborhoods) {
-		  //console.log(chicagoNeighborhoods[neighborhood])
+		  ////console.log(chicagoNeighborhoods[neighborhood])
 		  var data = chicagoNeighborhoods[neighborhood]
 		  var border =  new google.maps.Polygon({
 		          path: data.coords,
@@ -310,11 +389,11 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 
 
 	function locationTrackNotRecieved(positionError){
-		console.log(positionError);
+		//console.log(positionError);
 	}
 
 	function locationNotRecieved(positionError){
-		console.log(positionError);
+		//console.log(positionError);
 	}
 
 

@@ -122,6 +122,7 @@
             <div class="panel-heading">{{key}}</div>
             <div class="panel-body">
               <p class="highlight-1" ng-repeat="text in value track by $index">{{text}}</p>
+              <div style="text-align: center;"><button class="go-to-btn" ng-click="goToNeighborhood(key)">Go to {{key}}</button></div>
             </div>
         </div><!--/.panel-->
 

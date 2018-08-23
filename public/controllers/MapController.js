@@ -11,6 +11,7 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 	var marker;
 	var userInfo;
 	var authResponse;
+	var avg = {};
 	$scope.clicked = false;
 	const url = 'http://localhost:9000/api'	
 	$scope.openName;
@@ -25,6 +26,15 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 	timeout: 5000,
 	maximumAge: 0
 	};
+
+	$scope.goToNeighborhood = function(neighborhood) {
+		console.log(neighborhood)
+		map.setCenter(avg[neighborhood])
+		$scope.openName = neighborhood
+		$scope.option = 2;
+		openHelper()
+
+	}
 
 
 	$scope.saveHighlightEdit = function(index) {
@@ -73,7 +83,6 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 
 
 	$scope.showHighlightOptions = function(index) {
-	
 		//console.log("click triggered")
 		document.getElementById("p" + index).style.width = "70%"
 		document.getElementById("edit" + index).style.display = "block"
@@ -82,7 +91,6 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 		document.getElementById("delete" + index).style.width = "10%"
 		document.getElementById("close" + index).style.display = "block"
 		document.getElementById("close" + index).style.width = "10%"
-
 
 	}
 
@@ -158,7 +166,7 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 	}
 
 
-	function avgCoords(coords) {
+	function avgCoords(neighborhood, coords) {
 		////console.log(coords);
 		var latSum = 0, latCount = 0;
 		var lngSum = 0, lngCount = 0;
@@ -168,7 +176,8 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 			latCount += coords[data].lat;
 			lngCount += coords[data].lng;
 		}
-	  return {lat: latCount/latSum, lng: lngCount/lngSum}
+	  avg[neighborhood] = {lat: latCount/latSum, lng: lngCount/lngSum}
+	  //console.log(avg)
 	}
 
 
@@ -252,18 +261,8 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 
 	}
 
-	function createInfoWindowContents(name) {
-		$scope.openName = name
-		$scope.option = 2
-		$scope.highlights = [];
-		var infoWindowContent = document.createElement('div');
-		var infoWindowName = document.createElement('p');
-		infoWindowName.textContent = name;
-		var infoButton = document.createElement('button');
-		infoButton.class = 'btn btn-success';
-		infoButton.textContent = "View highlights"
-		infoButton.addEventListener('click', function() {
-			if (typeof(authResponse) !== "undefined") {
+	function openHelper() {
+		if (typeof(authResponse) !== "undefined") {
 				$http.get(url + '/'+ authResponse.authResponse.userID + '/' + $scope.openName + '/allHighlights').then(function(response) {
 					console.log(response)
 
@@ -281,7 +280,22 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 
 				
 			document.getElementById("mySidebar").style.width = "25%";
-			document.getElementById("mySidebar").style.display = "block";	
+			document.getElementById("mySidebar").style.display = "block";
+
+	}
+
+	function createInfoWindowContents(name) {
+		$scope.openName = name
+		$scope.option = 2
+		$scope.highlights = [];
+		var infoWindowContent = document.createElement('div');
+		var infoWindowName = document.createElement('p');
+		infoWindowName.textContent = name;
+		var infoButton = document.createElement('button');
+		infoButton.class = 'btn btn-success';
+		infoButton.textContent = "View highlights"
+		infoButton.addEventListener('click', function() {
+				openHelper();
 		})
  		infoWindowContent.appendChild(infoWindowName)
 		infoWindowContent.appendChild(infoButton)
@@ -318,6 +332,7 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 		    var borough = coordinates[area]
 		    for(var neighborhood in borough) {
 		       var data = borough[neighborhood];
+		       avgCoords(neighborhood, data.coords)
 		       colors.push(data.color)
 		       var border = new google.maps.Polygon({
 		          path: data.coords,
@@ -338,8 +353,8 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 	function drawChicagoNeighborhoods() {
 		var i = 0
 		for (var neighborhood in chicagoNeighborhoods) {
-		  ////console.log(chicagoNeighborhoods[neighborhood])
 		  var data = chicagoNeighborhoods[neighborhood]
+		  avgCoords(neighborhood, data.coords)
 		  var border =  new google.maps.Polygon({
 		          path: data.coords,
 		          geodesic: true,

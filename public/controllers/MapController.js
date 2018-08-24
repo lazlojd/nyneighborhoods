@@ -322,7 +322,27 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 	'use strict';
 
 
-	//Info window when neighborhood is clicked
+	function drawSFNeighborhoods() {
+		var i = 0
+		for (var neighborhood in sfNeighborhoods) {
+		  var data = sfNeighborhoods[neighborhood]
+		  avgCoords(neighborhood, data.coords)
+		  var border =  new google.maps.Polygon({
+		          path: data.coords,
+		          geodesic: true,
+		          strokeColor: '#' + colors[i],
+		          strokeOpacity: 1.0,
+		          strokeWeight: 2,
+		          fillColor: '#' + colors[i],
+		          fillOpacity: 0.25
+		  });
+		  i += 1
+		  if (i >= colors.length)
+		    i = 0
+		  addListeners(border, neighborhood)
+		  border.setMap(map)
+		}
+	}
 	
 
 	function drawNYNeighborhoods() {
@@ -384,6 +404,7 @@ app.controller('MapController', ['$scope', '$http', function($scope, $http) {
 	  beginPositionWatch()
 	  drawNYNeighborhoods()
 	  drawChicagoNeighborhoods()
+	  drawSFNeighborhoods()
 	  var highlightControlDiv = document.createElement('div');
 	  var highlightControl = new HighlightControl(highlightControlDiv, map, false);
 

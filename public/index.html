@@ -81,6 +81,7 @@
                 <div id="fbButton" class="fb-login-button btn-center" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false" scope="public_profile,email"
               o onlogin="checkLoginState();"></div>
              
+
               <script type="text/javascript"> function checkLoginState() {
                 FB.getLoginStatus(function(response) {
                     console.log(response)
@@ -136,6 +137,7 @@
       <!-- Specific neighborhood highlight sidebar view-->
       <div ng-if="option == 2">
         <div style="margin-top: 75px;" class="panel panel-default" >
+          <i>Click on highlight to edit or delete</i>
             <div class="panel-heading">Your {{openName}} Highlights</div>
             <div class="panel-body flex-container">
               <div class="highlight-border" ng-repeat="text in highlights track by $index">
@@ -169,6 +171,7 @@
       <div>
         
       </div>
+       <a href="https://www.freeprivacypolicy.com/privacy/view/a67e0e4287a883e05267df47853f1988" target="_blank" style="position: fixed; bottom:0px; left:0px;"> Privacy Policy </a>
       </div>
 
 

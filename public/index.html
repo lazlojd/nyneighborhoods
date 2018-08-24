@@ -51,8 +51,8 @@
 
   </head>
   <body ng-app="neighborhoods1.0">
+    <!-- FB login SDK -->
     <script type="text/javascript" src="/js/fbLogin.js"></script>
-
     <div id="fb-root"></div>
     <script>(function(d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0];
@@ -63,7 +63,7 @@
     }(document, 'script', 'facebook-jssdk'));</script>
 
     <div ng-controller="MapController" class="app-container">
-      <!-- Modal -->
+      <!-- log in Modal -->
       <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalWindow" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -81,7 +81,6 @@
                 <div id="fbButton" class="fb-login-button btn-center" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false" scope="public_profile,email"
               o onlogin="checkLoginState();"></div>
              
-            
               <script type="text/javascript"> function checkLoginState() {
                 FB.getLoginStatus(function(response) {
                     console.log(response)
@@ -110,14 +109,17 @@
           </div>
         </div>
       </div>
+      <!-- End log in modal -->
+
+      <!-- Sidebar header -->
       <div class="w3-sidebar w3-bar-block w3-card w3-animate-left sidebar-panel" style="display:none;" id="mySidebar">
-        <!-- <button class="btn-sidebar-left w3-bar-item w3-button w3-large "
-        ng-click="logOut()">Log in &times;</button> -->
         <button class="btn-sidebar-left w3-bar-item w3-button w3-large "
         ng-click="logOut()">Log out </button>
         <button class="btn-sidebar-right w3-bar-item w3-button w3-large"
         ng-click="closeSidebar()">Close &times;</button>
+      <!-- End sidebar header -->
 
+      <!-- All highlights sidebar view -->
       <div style="margin-top: 75px;" ng-if="option == 1">
         <div class="panel panel-default" ng-repeat="(key, value) in allHighlights">
             <div class="panel-heading">{{key}}</div>
@@ -125,14 +127,13 @@
               <p class="highlight-1" ng-repeat="text in value track by $index">{{text}}</p>
               <div style="text-align: center;"><button class="go-to-btn" ng-click="goToNeighborhood(key)">Go to {{key}}</button></div>
             </div>
-        </div><!--/.panel-->
-
-
+        </div>
       </div>
+      <!--End all highlights sidebar view-->
 
 
 
-
+      <!-- Specific neighborhood highlight sidebar view-->
       <div ng-if="option == 2">
         <div style="margin-top: 75px;" class="panel panel-default" >
             <div class="panel-heading">Your {{openName}} Highlights</div>
@@ -151,7 +152,7 @@
             
             </div>
             </div>
-        </div><!--/.panel-->
+        </div>
 
         <form class="highlight-form" name="highlightForm">
           <div>
@@ -163,6 +164,7 @@
           <button type="submit" class="btn btn-success" ng-click="processNewHighlight()" ng-if="loggedIn">Submit</button>
         </form>
     </div>
+    <!-- end specific neighborhood highlight sidebar view-->
 
       <div>
         
@@ -172,12 +174,14 @@
 
 
 
+      <!-- Google map -->
 
       <div id="map">
         
       </div>
       <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFUgxmwei_B8JH28wypn0I-l3ZfNQ1DSk&callback=initMap"
       async defer></script>
+      <!-- End google map -->
 
       
     </div>

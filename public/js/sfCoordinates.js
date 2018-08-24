@@ -3693,7 +3693,7 @@ Bayview: {
 		lng: 
                 -122.399755
 	}]},
-"<![CDATA[Hunter's Point]]>": {
+"Hunter's Point": {
 	coords:[{
 		lat: 37.745234,
 		lng: 
